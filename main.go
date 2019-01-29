@@ -18,7 +18,7 @@ func main() {
 		}
 	}
 
-	bot, err := tgbotapi.NewBotAPI("769246589:AAFdQOYHwW8cZTZD_mkVCxGtTSbRg_lWqMo")
+	bot, err := tgbotapi.NewBotAPI(os.Getenv("BOT_TOKEN"))
 	if err != nil {
 		log.Fatal(err)
 	}
