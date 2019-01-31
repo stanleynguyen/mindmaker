@@ -6,8 +6,8 @@ import (
 	"os"
 
 	"github.com/joho/godotenv"
-
-	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
+	"github.com/stanleynguyen/mindmaker/mindmaker"
+	"github.com/stanleynguyen/mindmaker/persistence/redis"
 )
 
 func main() {
@@ -18,26 +18,19 @@ func main() {
 		}
 	}
 
-	bot, err := tgbotapi.NewBotAPI(os.Getenv("BOT_TOKEN"))
+	database, err := redis.NewInstance(os.Getenv("DB"))
+	if err != nil {
+		log.Fatal(err)
+	}
+	err = mindmaker.Initialize(mindmaker.Config{
+		Token:         os.Getenv("BOT_TOKEN"),
+		SSL:           false,
+		WebhookAddr:   os.Getenv("WEBHOOK_URL"),
+		ListeningPath: "/",
+	}, database)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	bot.Debug = true
-
-	log.Printf("Authorized on account %s", bot.Self.UserName)
-
-	_, err = bot.SetWebhook(tgbotapi.NewWebhook(os.Getenv("WEBHOOK_URL")))
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	updates := bot.ListenForWebhook("/")
-	go func(updates tgbotapi.UpdatesChannel) {
-		for update := range updates {
-			log.Printf("%+v\n", update.Message.Text)
-		}
-	}(updates)
-
-	http.ListenAndServe(":8080", nil)
+	http.ListenAndServe(":"+os.Getenv("PORT"), nil)
 }

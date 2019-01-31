@@ -2,6 +2,22 @@
 
 
 [[projects]]
+  digest = "1:ad53d1f710522a38d1f0e5e0a55a194b1c6b2cd8e84313568e43523271f0cf62"
+  name = "github.com/go-redis/redis"
+  packages = [
+    ".",
+    "internal",
+    "internal/consistenthash",
+    "internal/hashtag",
+    "internal/pool",
+    "internal/proto",
+    "internal/util",
+  ]
+  pruneopts = "UT"
+  revision = "22be8a3eaf992c828cecb69dc07348313bf08d2e"
+  version = "v6.15.1"
+
+[[projects]]
   digest = "1:51712f342cdefcad2c867f399a3ce8223675221d4386c81cfcccd8f0656e722e"
   name = "github.com/go-telegram-bot-api/telegram-bot-api"
   packages = ["."]
@@ -29,6 +45,7 @@
   analyzer-name = "dep"
   analyzer-version = 1
   input-imports = [
+    "github.com/go-redis/redis",
     "github.com/go-telegram-bot-api/telegram-bot-api",
     "github.com/joho/godotenv",
   ]

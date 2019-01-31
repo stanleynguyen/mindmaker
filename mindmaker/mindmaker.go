@@ -2,6 +2,7 @@ package mindmaker
 
 import (
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
+	"github.com/stanleynguyen/mindmaker/persistence"
 )
 
 // Config configurations for mindmaker bot
@@ -21,7 +22,7 @@ type Config struct {
 }
 
 // Initialize initialize bot webhook to handle messages from Telegram
-func Initialize(config Config) error {
+func Initialize(config Config, db *persistence.Persistence) error {
 	bot, err := tgbotapi.NewBotAPI(config.Token)
 	if err != nil {
 		return err
@@ -38,8 +39,9 @@ func Initialize(config Config) error {
 		return err
 	}
 
+	reducer := NewReducer(bot, db)
 	updates := bot.ListenForWebhook(config.ListeningPath)
-	go HandleUpdates(updates)
+	go reducer.HandleUpdates(updates)
 
 	return nil
 }
