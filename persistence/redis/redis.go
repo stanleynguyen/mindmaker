@@ -33,6 +33,11 @@ func (r *Redis) UpdateDefaultBucket(chatID int64, bucketName string) error {
 	return r.Client.Set(strconv.Itoa(int(chatID)), bucketName, 0).Err()
 }
 
+// GetDefaultBucket get the default bucket of current chat
+func (r *Redis) GetDefaultBucket(chatID int64) (string, error) {
+	return r.Client.Get(strconv.Itoa(int(chatID))).Result()
+}
+
 // DeleteBucket remove a bucket from database
 func (r *Redis) DeleteBucket(bucketName string) error {
 	return r.Client.Set(bucketName, nil, 0).Err()
@@ -62,7 +67,7 @@ func (r *Redis) ReadAllOptions(bucketName string) ([]domain.Option, error) {
 	}
 
 	var options []domain.Option
-	err = json.Unmarshal([]byte(rsStr), options)
+	err = json.Unmarshal([]byte(rsStr), &options)
 	if err != nil {
 		return nil, err
 	}

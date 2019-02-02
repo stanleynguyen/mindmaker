@@ -6,6 +6,8 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/stanleynguyen/mindmaker/domain"
+
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
 	"github.com/stanleynguyen/mindmaker/persistence"
 )
@@ -31,6 +33,8 @@ func (r *Reducer) HandleUpdates(updates tgbotapi.UpdatesChannel) {
 			r.handleSetCommand(update)
 		case "scrap":
 			r.handleScrapCommand(update)
+		case "list":
+			r.handleListCommand(update)
 		}
 	}
 }
@@ -106,11 +110,50 @@ func (r *Reducer) handleScrapCommand(update tgbotapi.Update) {
 	r.Bot.Send(msg)
 }
 
-func getBucketNameFromChatID(chatID int64, userGivenName string) string {
-	return strconv.Itoa(int(chatID)) + "-" + userGivenName
+func (r *Reducer) handleListCommand(update tgbotapi.Update) {
+	bucketName, err := r.Persistence.GetDefaultBucket(update.Message.Chat.ID)
+	if err != nil {
+		log.Println(err)
+		r.sendErrMessage(update.Message.Chat.ID)
+		return
+	} else if bucketName == "" {
+		msg := tgbotapi.NewMessage(update.Message.Chat.ID, "There's currently no bucket set to read from 😕")
+		r.Bot.Send(msg)
+		return
+	}
+
+	options, err := r.Persistence.ReadAllOptions(bucketName)
+	if err != nil {
+		log.Println(err)
+		r.sendErrMessage(update.Message.Chat.ID)
+		return
+	}
+
+	msg := tgbotapi.NewMessage(update.Message.Chat.ID, getFormattedListOfOptions(options))
+	r.Bot.Send(msg)
 }
 
 func (r *Reducer) sendErrMessage(chatID int64) {
 	errMsg := tgbotapi.NewMessage(chatID, "Sorry I'm not feeeling very well :( Please try again later")
 	r.Bot.Send(errMsg)
+}
+
+func getBucketNameFromChatID(chatID int64, userGivenName string) string {
+	return strconv.Itoa(int(chatID)) + " - " + userGivenName
+}
+
+func getFormattedListOfOptions(options []domain.Option) string {
+	if len(options) == 0 {
+		return "Opps! Your current bucket doesnt contain any options"
+	}
+
+	rtv := "Possible decisions in your current default buckets:\n"
+	for i := 0; i < len(options); i++ {
+		rtv += fmt.Sprintf("- %v", options[i])
+		if i < len(options)-1 {
+			rtv += "\n"
+		}
+	}
+
+	return rtv
 }
