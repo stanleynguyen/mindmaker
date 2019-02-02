@@ -29,6 +29,8 @@ func (r *Reducer) HandleUpdates(updates tgbotapi.UpdatesChannel) {
 			r.handleCreateCommand(update)
 		case "set":
 			r.handleSetCommand(update)
+		case "scrap":
+			r.handleScrapCommand(update)
 		}
 	}
 }
@@ -45,7 +47,7 @@ func (r *Reducer) handleCreateCommand(update tgbotapi.Update) {
 		return
 	}
 
-	bucketName := strconv.Itoa(int(update.Message.Chat.ID)) + " - " + argStr
+	bucketName := getBucketNameFromChatID(update.Message.Chat.ID, argStr)
 	// TODO: check if bucket already exists
 	err := r.Persistence.InsertBucket(bucketName)
 	if err != nil {
@@ -70,7 +72,7 @@ func (r *Reducer) handleSetCommand(update tgbotapi.Update) {
 		return
 	}
 
-	bucketName := strconv.Itoa(int(update.Message.Chat.ID)) + "-" + argStr
+	bucketName := getBucketNameFromChatID(update.Message.Chat.ID, argStr)
 	// TODO: check if bucket exists
 	err := r.Persistence.UpdateDefaultBucket(update.Message.Chat.ID, bucketName)
 	if err != nil {
@@ -81,6 +83,31 @@ func (r *Reducer) handleSetCommand(update tgbotapi.Update) {
 
 	msg := tgbotapi.NewMessage(update.Message.Chat.ID, fmt.Sprintf("You have selected bucket %v to draw decision from 😉", argStr))
 	r.Bot.Send(msg)
+}
+
+func (r *Reducer) handleScrapCommand(update tgbotapi.Update) {
+	argStr := getPrettyArgumentString(update.Message.CommandArguments())
+	if argStr == "" {
+		msg := tgbotapi.NewMessage(update.Message.Chat.ID, "Boss 😱 Please gimme some name at least by telling me in this format: /scrap <bucket name>")
+		r.Bot.Send(msg)
+		return
+	}
+
+	bucketName := getBucketNameFromChatID(update.Message.Chat.ID, argStr)
+	// TODO check if bucket exists
+	err := r.Persistence.DeleteBucket(bucketName)
+	if err != nil {
+		log.Println(err)
+		r.sendErrMessage(update.Message.Chat.ID)
+		return
+	}
+
+	msg := tgbotapi.NewMessage(update.Message.Chat.ID, fmt.Sprintf("Bucket %v is out of the window 😶", argStr))
+	r.Bot.Send(msg)
+}
+
+func getBucketNameFromChatID(chatID int64, userGivenName string) string {
+	return strconv.Itoa(int(chatID)) + "-" + userGivenName
 }
 
 func (r *Reducer) sendErrMessage(chatID int64) {
