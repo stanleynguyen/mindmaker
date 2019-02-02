@@ -3,6 +3,7 @@ package mindmaker
 import (
 	"fmt"
 	"log"
+	"strconv"
 	"strings"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
@@ -26,6 +27,8 @@ func (r *Reducer) HandleUpdates(updates tgbotapi.UpdatesChannel) {
 		switch update.Message.Command() {
 		case "create":
 			r.handleCreateCommand(update)
+		case "set":
+			r.handleSetCommand(update)
 		}
 	}
 }
@@ -37,16 +40,15 @@ func getPrettyArgumentString(rawArgString string) string {
 func (r *Reducer) handleCreateCommand(update tgbotapi.Update) {
 	argStr := getPrettyArgumentString(update.Message.CommandArguments())
 	if argStr == "" {
-		msg := tgbotapi.NewMessage(update.Message.Chat.ID, "I'm confused 😵 My buckets can't have empty names\nPlease tell me in this format: /create <your bucket name>")
+		msg := tgbotapi.NewMessage(update.Message.Chat.ID, "I'm confused 😵 My buckets cant have empty names\nPlease tell me in this format: /create <your bucket name>")
 		r.Bot.Send(msg)
 		return
 	}
 
-	bucketName := string(update.Message.Chat.ID) + " - " + argStr
+	bucketName := strconv.Itoa(int(update.Message.Chat.ID)) + " - " + argStr
 	// TODO: check if bucket already exists
 	err := r.Persistence.InsertBucket(bucketName)
 	if err != nil {
-		log.Println(err)
 		r.sendErrMessage(update.Message.Chat.ID)
 		return
 	}
@@ -57,6 +59,27 @@ func (r *Reducer) handleCreateCommand(update tgbotapi.Update) {
 	}
 
 	msg := tgbotapi.NewMessage(update.Message.Chat.ID, fmt.Sprintf("Bucket %v created for you, boss!", argStr))
+	r.Bot.Send(msg)
+}
+
+func (r *Reducer) handleSetCommand(update tgbotapi.Update) {
+	argStr := getPrettyArgumentString(update.Message.CommandArguments())
+	if argStr == "" {
+		msg := tgbotapi.NewMessage(update.Message.Chat.ID, "Boss 😱 Please gimme some name at least by telling me in this format: /set <bucket name>")
+		r.Bot.Send(msg)
+		return
+	}
+
+	bucketName := strconv.Itoa(int(update.Message.Chat.ID)) + "-" + argStr
+	// TODO: check if bucket exists
+	err := r.Persistence.UpdateDefaultBucket(update.Message.Chat.ID, bucketName)
+	if err != nil {
+		log.Println(err)
+		r.sendErrMessage(update.Message.Chat.ID)
+		return
+	}
+
+	msg := tgbotapi.NewMessage(update.Message.Chat.ID, fmt.Sprintf("You have selected bucket %v to draw decision from 😉", argStr))
 	r.Bot.Send(msg)
 }
 

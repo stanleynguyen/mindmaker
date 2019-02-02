@@ -2,6 +2,7 @@ package redis
 
 import (
 	"encoding/json"
+	"strconv"
 
 	"github.com/go-redis/redis"
 	"github.com/stanleynguyen/mindmaker/domain"
@@ -29,7 +30,7 @@ func (r *Redis) InsertBucket(name string) error {
 
 // UpdateDefaultBucket change the default bucket for chat to draw from
 func (r *Redis) UpdateDefaultBucket(chatID int64, bucketName string) error {
-	return r.Client.Set(string(chatID), bucketName, 0).Err()
+	return r.Client.Set(strconv.Itoa(int(chatID)), bucketName, 0).Err()
 }
 
 // DeleteBucket remove a bucket from database

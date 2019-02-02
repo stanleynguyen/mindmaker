@@ -1,6 +1,8 @@
 package mindmaker
 
 import (
+	"log"
+
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
 	"github.com/stanleynguyen/mindmaker/persistence"
 )
@@ -34,6 +36,7 @@ func Initialize(config Config, db persistence.Persistence) error {
 	} else {
 		webhook = tgbotapi.NewWebhook(config.WebhookAddr + config.ListeningPath)
 	}
+	log.Println(webhook)
 	_, err = bot.SetWebhook(webhook)
 	if err != nil {
 		return err
