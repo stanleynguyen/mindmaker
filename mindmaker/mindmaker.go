@@ -22,7 +22,7 @@ type Config struct {
 }
 
 // Initialize initialize bot webhook to handle messages from Telegram
-func Initialize(config Config, db *persistence.Persistence) error {
+func Initialize(config Config, db persistence.Persistence) error {
 	bot, err := tgbotapi.NewBotAPI(config.Token)
 	if err != nil {
 		return err
