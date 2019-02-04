@@ -2,6 +2,7 @@ package mindmaker
 
 import (
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
+	"github.com/stanleynguyen/mindmaker/mindmaker/reducer"
 	"github.com/stanleynguyen/mindmaker/persistence"
 )
 
@@ -39,7 +40,7 @@ func Initialize(config Config, db persistence.Persistence) error {
 		return err
 	}
 
-	reducer := NewReducer(bot, db)
+	reducer := reducer.NewReducer(bot, db)
 	updates := bot.ListenForWebhook(config.ListeningPath)
 	go reducer.HandleUpdates(updates)
 
