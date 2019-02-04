@@ -2,10 +2,13 @@ package redis
 
 import (
 	"encoding/json"
+	"fmt"
 	"strconv"
+	"strings"
 
 	"github.com/go-redis/redis"
 	"github.com/stanleynguyen/mindmaker/domain"
+	"github.com/stanleynguyen/mindmaker/mindmaker/reducer"
 )
 
 // Redis abstraction for redis database
@@ -60,6 +63,27 @@ func (r *Redis) DefaultWasSet(chatID int64) (bool, error) {
 // DeleteBucket remove a bucket from database
 func (r *Redis) DeleteBucket(bucketName string) error {
 	return r.Client.Del(bucketName).Err()
+}
+
+// GetAllBuckets get all buckets in a chat
+func (r *Redis) GetAllBuckets(chatID int64) ([]domain.Bucket, error) {
+	bucketNames, err := r.Client.Keys(fmt.Sprintf("%v%v*", chatID, reducer.BucketNameSeparator)).Result()
+	if err != nil {
+		return nil, err
+	}
+
+	buckets := []domain.Bucket{}
+	for _, name := range bucketNames {
+		userReadableName := strings.SplitN(name, reducer.BucketNameSeparator, 2)[1]
+		b := domain.Bucket{
+			ChatID:  chatID,
+			Name:    userReadableName,
+			Options: nil,
+		}
+		buckets = append(buckets, b)
+	}
+
+	return buckets, nil
 }
 
 // InsertOption put an option inside a bucket
