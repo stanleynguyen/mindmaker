@@ -40,7 +40,7 @@ func (r *Redis) GetDefaultBucket(chatID int64) (string, error) {
 
 // DeleteBucket remove a bucket from database
 func (r *Redis) DeleteBucket(bucketName string) error {
-	return r.Client.Set(bucketName, nil, 0).Err()
+	return r.Client.Del(bucketName).Err()
 }
 
 // InsertOption put an option inside a bucket
@@ -61,6 +61,31 @@ func (r *Redis) InsertOption(bucketName string, option domain.Option) error {
 
 // ReadAllOptions query all options inside a bucket
 func (r *Redis) ReadAllOptions(bucketName string) ([]domain.Option, error) {
+	return r.getOptions(bucketName)
+}
+
+// DeleteOption remove an option from a bucket
+func (r *Redis) DeleteOption(bucketName string, optionIdx int) ([]domain.Option, error) {
+	options, err := r.getOptions(bucketName)
+	if err != nil {
+		return nil, err
+	}
+
+	options = append(options[:optionIdx], options[optionIdx+1:]...)
+	strVal, err := json.Marshal(options)
+	if err != nil {
+		return nil, err
+	}
+
+	err = r.Client.Set(bucketName, strVal, 0).Err()
+	if err != nil {
+		return nil, err
+	}
+
+	return options, nil
+}
+
+func (r *Redis) getOptions(bucketName string) ([]domain.Option, error) {
 	rsStr, err := r.Client.Get(bucketName).Result()
 	if err != nil {
 		return nil, err
@@ -73,9 +98,4 @@ func (r *Redis) ReadAllOptions(bucketName string) ([]domain.Option, error) {
 	}
 
 	return options, nil
-}
-
-// DeleteOption remove an option from a bucket
-func (r *Redis) DeleteOption(bucketName string, optionIdx int) error {
-	return r.Client.Del(bucketName).Err()
 }

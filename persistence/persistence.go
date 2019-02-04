@@ -10,5 +10,5 @@ type Persistence interface {
 	DeleteBucket(name string) error
 	InsertOption(bucketName string, option domain.Option) error
 	ReadAllOptions(bucketName string) ([]domain.Option, error)
-	DeleteOption(bucketName string, optionIdx int) error
+	DeleteOption(bucketName string, optionIdx int) ([]domain.Option, error)
 }

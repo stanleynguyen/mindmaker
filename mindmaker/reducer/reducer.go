@@ -32,6 +32,8 @@ func (r *Reducer) HandleUpdates(updates tgbotapi.UpdatesChannel) {
 			r.handleAddCommand(update)
 		case "draw":
 			r.handleDrawCommand(update)
+		case "takeout":
+			r.handleTakeoutCommand(update)
 		}
 	}
 }
