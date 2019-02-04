@@ -16,8 +16,16 @@ func (r *Reducer) handleScrapCommand(update tgbotapi.Update) {
 	}
 
 	bucketName := getBucketNameFromChatID(update.Message.Chat.ID, argStr)
-	// TODO check if bucket exists
-	err := r.Persistence.DeleteBucket(bucketName)
+	bucketDoesExist, err := r.Persistence.Exists(bucketName)
+	if err != nil {
+		r.sendErrMessage(update.Message.Chat.ID)
+		return
+	} else if !bucketDoesExist {
+		msg := tgbotapi.NewMessage(update.Message.Chat.ID, fmt.Sprintf("Oops 😶 I can't find bucket %v anywhere, boss\nAre you sure you you have created it with the create command before?", argStr))
+		r.Bot.Send(msg)
+		return
+	}
+	err = r.Persistence.DeleteBucket(bucketName)
 	if err != nil {
 		log.Println(err)
 		r.sendErrMessage(update.Message.Chat.ID)
