@@ -32,8 +32,3 @@ func (r *Reducer) handleDrawCommand(update tgbotapi.Update) {
 	msg := tgbotapi.NewMessage(update.Message.Chat.ID, fmt.Sprintf("🎊 Boss you have drawn decision %v 🎉", drawnOption))
 	r.Bot.Send(msg)
 }
-
-func (r *Reducer) sendErrMessage(chatID int64) {
-	errMsg := tgbotapi.NewMessage(chatID, "Sorry I'm not feeeling very well :( Please try again later")
-	r.Bot.Send(errMsg)
-}

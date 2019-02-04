@@ -5,6 +5,7 @@ import (
 	"strconv"
 	"strings"
 
+	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
 	"github.com/stanleynguyen/mindmaker/domain"
 )
 
@@ -34,4 +35,9 @@ func getFormattedListOfOptions(options []domain.Option) string {
 	}
 
 	return rtv
+}
+
+func (r *Reducer) sendErrMessage(chatID int64) {
+	errMsg := tgbotapi.NewMessage(chatID, "Sorry I'm not feeeling very well 🤒 Please try again later")
+	r.Bot.Send(errMsg)
 }

@@ -36,6 +36,8 @@ func (r *Reducer) HandleUpdates(updates tgbotapi.UpdatesChannel) {
 			r.handleTakeoutCommand(update)
 		case "buckets":
 			r.handleBucketsCommand(update)
+		default:
+			r.handleAllOthersUpdate(update)
 		}
 	}
 }
