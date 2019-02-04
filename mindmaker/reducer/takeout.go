@@ -10,14 +10,21 @@ import (
 )
 
 func (r *Reducer) handleTakeoutCommand(update tgbotapi.Update) {
-	bucketName, err := r.Persistence.GetDefaultBucket(update.Message.Chat.ID)
+	defaultSet, err := r.Persistence.DefaultWasSet(update.Message.Chat.ID)
 	if err != nil {
 		log.Println(err)
 		r.sendErrMessage(update.Message.Chat.ID)
 		return
-	} else if bucketName == "" {
+	}
+	if !defaultSet {
 		msg := tgbotapi.NewMessage(update.Message.Chat.ID, "There's currently no bucket set to take out any decision from 😕")
 		r.Bot.Send(msg)
+		return
+	}
+	bucketName, err := r.Persistence.GetDefaultBucket(update.Message.Chat.ID)
+	if err != nil {
+		log.Println(err)
+		r.sendErrMessage(update.Message.Chat.ID)
 		return
 	}
 

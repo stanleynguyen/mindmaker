@@ -8,6 +8,7 @@ type Persistence interface {
 	UpdateDefaultBucket(chatID int64, bucketName string) error
 	GetDefaultBucket(chatID int64) (string, error)
 	Exists(bucketName string) (bool, error)
+	DefaultWasSet(chatID int64) (bool, error)
 	DeleteBucket(name string) error
 	InsertOption(bucketName string, option domain.Option) error
 	ReadAllOptions(bucketName string) ([]domain.Option, error)

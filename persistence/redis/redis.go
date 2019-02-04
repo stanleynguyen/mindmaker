@@ -52,6 +52,11 @@ func (r *Redis) Exists(bucketName string) (bool, error) {
 	return false, nil
 }
 
+// DefaultWasSet check if a default bucket set for a chat
+func (r *Redis) DefaultWasSet(chatID int64) (bool, error) {
+	return r.Exists(strconv.Itoa(int(chatID)))
+}
+
 // DeleteBucket remove a bucket from database
 func (r *Redis) DeleteBucket(bucketName string) error {
 	return r.Client.Del(bucketName).Err()
