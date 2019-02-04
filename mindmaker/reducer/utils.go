@@ -8,14 +8,16 @@ import (
 	"github.com/stanleynguyen/mindmaker/domain"
 )
 
-const BUCKET_NAME_SEPARATOR = " - "
+// BucketNameSeparator string used for concatting chatID with user defined name
+// to form bucket names
+const BucketNameSeparator = " - "
 
 func getPrettyArgumentString(rawArgString string) string {
 	return strings.Trim(rawArgString, " ")
 }
 
 func getBucketNameFromChatID(chatID int64, userGivenName string) string {
-	return strconv.Itoa(int(chatID)) + BUCKET_NAME_SEPARATOR + userGivenName
+	return strconv.Itoa(int(chatID)) + BucketNameSeparator + userGivenName
 }
 
 func getFormattedListOfOptions(options []domain.Option) string {

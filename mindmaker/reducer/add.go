@@ -36,7 +36,7 @@ func (r *Reducer) handleAddCommand(update tgbotapi.Update) {
 		return
 	}
 
-	userReadableBucketName := strings.SplitN(bucketName, BUCKET_NAME_SEPARATOR, 2)[1]
+	userReadableBucketName := strings.SplitN(bucketName, BucketNameSeparator, 2)[1]
 	msg := tgbotapi.NewMessage(update.Message.Chat.ID, fmt.Sprintf("Decision %v added to bucket %v", argStr, userReadableBucketName))
 	r.Bot.Send(msg)
 }
