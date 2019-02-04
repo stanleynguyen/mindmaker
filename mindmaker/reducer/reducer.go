@@ -19,6 +19,10 @@ func NewReducer(bot *tgbotapi.BotAPI, db persistence.Persistence) *Reducer {
 // HandleUpdates reduce updates to correct handler function
 func (r *Reducer) HandleUpdates(updates tgbotapi.UpdatesChannel) {
 	for update := range updates {
+		if update.Message == nil {
+			return
+		}
+
 		switch update.Message.Command() {
 		case "create":
 			r.handleCreateCommand(update)
