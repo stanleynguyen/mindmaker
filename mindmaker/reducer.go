@@ -35,12 +35,10 @@ func (r *Reducer) HandleUpdates(updates tgbotapi.UpdatesChannel) {
 			r.handleScrapCommand(update)
 		case "list":
 			r.handleListCommand(update)
+		case "add":
+			r.handleAddCommand(update)
 		}
 	}
-}
-
-func getPrettyArgumentString(rawArgString string) string {
-	return strings.Trim(rawArgString, " ")
 }
 
 func (r *Reducer) handleCreateCommand(update tgbotapi.Update) {
@@ -133,9 +131,37 @@ func (r *Reducer) handleListCommand(update tgbotapi.Update) {
 	r.Bot.Send(msg)
 }
 
+func (r *Reducer) handleAddCommand(update tgbotapi.Update) {
+	bucketName, err := r.Persistence.GetDefaultBucket(update.Message.Chat.ID)
+	if err != nil {
+		log.Println(err)
+		r.sendErrMessage(update.Message.Chat.ID)
+		return
+	} else if bucketName == "" {
+		msg := tgbotapi.NewMessage(update.Message.Chat.ID, "There's currently no bucket set to add this decision to 😕")
+		r.Bot.Send(msg)
+		return
+	}
+
+	argStr := getPrettyArgumentString(update.Message.CommandArguments())
+	err = r.Persistence.InsertOption(bucketName, domain.Option(argStr))
+	if err != nil {
+		log.Println(err)
+		r.sendErrMessage(update.Message.Chat.ID)
+		return
+	}
+
+	msg := tgbotapi.NewMessage(update.Message.Chat.ID, fmt.Sprintf("Decision %v addede to bucket %v", argStr, bucketName))
+	r.Bot.Send(msg)
+}
+
 func (r *Reducer) sendErrMessage(chatID int64) {
 	errMsg := tgbotapi.NewMessage(chatID, "Sorry I'm not feeeling very well :( Please try again later")
 	r.Bot.Send(errMsg)
+}
+
+func getPrettyArgumentString(rawArgString string) string {
+	return strings.Trim(rawArgString, " ")
 }
 
 func getBucketNameFromChatID(chatID int64, userGivenName string) string {
@@ -147,7 +173,7 @@ func getFormattedListOfOptions(options []domain.Option) string {
 		return "Opps! Your current bucket doesnt contain any options"
 	}
 
-	rtv := "Possible decisions in your current default buckets:\n"
+	rtv := "Possible decisions in your current default bucket:\n"
 	for i := 0; i < len(options); i++ {
 		rtv += fmt.Sprintf("- %v", options[i])
 		if i < len(options)-1 {
