@@ -16,14 +16,22 @@ func (r *Reducer) handleSetCommand(update tgbotapi.Update) {
 	}
 
 	bucketName := getBucketNameFromChatID(update.Message.Chat.ID, argStr)
-	// TODO: check if bucket exists
-	err := r.Persistence.UpdateDefaultBucket(update.Message.Chat.ID, bucketName)
+	bucketDoesExist, err := r.Persistence.Exists(bucketName)
+	if err != nil {
+		r.sendErrMessage(update.Message.Chat.ID)
+		return
+	} else if !bucketDoesExist {
+		msg := tgbotapi.NewMessage(update.Message.Chat.ID, fmt.Sprintf("Oops 😶 I can't find bucket %v anywhere, boss\nAre you sure you you have created it with the create command before?", argStr))
+		r.Bot.Send(msg)
+		return
+	}
+	err = r.Persistence.UpdateDefaultBucket(update.Message.Chat.ID, bucketName)
 	if err != nil {
 		log.Println(err)
 		r.sendErrMessage(update.Message.Chat.ID)
 		return
 	}
 
-	msg := tgbotapi.NewMessage(update.Message.Chat.ID, fmt.Sprintf("You have selected bucket %v to draw decision from 😉", argStr))
+	msg := tgbotapi.NewMessage(update.Message.Chat.ID, fmt.Sprintf("You have selected bucket %v to draw decisions from 😉", argStr))
 	r.Bot.Send(msg)
 }
