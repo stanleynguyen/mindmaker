@@ -38,6 +38,20 @@ func (r *Redis) GetDefaultBucket(chatID int64) (string, error) {
 	return r.Client.Get(strconv.Itoa(int(chatID))).Result()
 }
 
+// Exists check if a bucket exists in database
+func (r *Redis) Exists(bucketName string) (bool, error) {
+	rs, err := r.Client.Exists(bucketName).Result()
+	if err != nil {
+		return false, err
+	}
+
+	if rs > 0 {
+		return true, nil
+	}
+
+	return false, nil
+}
+
 // DeleteBucket remove a bucket from database
 func (r *Redis) DeleteBucket(bucketName string) error {
 	return r.Client.Del(bucketName).Err()

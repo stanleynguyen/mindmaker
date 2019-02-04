@@ -15,8 +15,23 @@ func (r *Reducer) handleCreateCommand(update tgbotapi.Update) {
 	}
 
 	bucketName := getBucketNameFromChatID(update.Message.Chat.ID, argStr)
-	// TODO: check if bucket already exists
-	err := r.Persistence.InsertBucket(bucketName)
+	bucketDoesExist, err := r.Persistence.Exists(bucketName)
+	if err != nil {
+		r.sendErrMessage(update.Message.Chat.ID)
+		return
+	} else if bucketDoesExist {
+		msg := tgbotapi.NewMessage(update.Message.Chat.ID, fmt.Sprintf("Sorry boss 🧐 bucket %v is already existing\nI'm setting it default bucket for you!", argStr))
+		r.Bot.Send(msg)
+		err := r.Persistence.UpdateDefaultBucket(update.Message.Chat.ID, getBucketNameFromChatID(update.Message.Chat.ID, argStr))
+		if err != nil {
+			r.sendErrMessage(update.Message.Chat.ID)
+			return
+		}
+		msg = tgbotapi.NewMessage(update.Message.Chat.ID, fmt.Sprintf("Updated bucket %v to be default!", argStr))
+		r.Bot.Send(msg)
+		return
+	}
+	err = r.Persistence.InsertBucket(bucketName)
 	if err != nil {
 		r.sendErrMessage(update.Message.Chat.ID)
 		return
