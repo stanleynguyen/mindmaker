@@ -29,6 +29,11 @@ func (r *Reducer) handleAddCommand(update tgbotapi.Update) {
 	}
 
 	argStr := getPrettyArgumentString(update.Message.CommandArguments())
+	if argStr == "" {
+		msg := tgbotapi.NewMessage(update.Message.Chat.ID, "Boss, your decision can't be an empty one 🤪\nPlease tell me in this format: /add <your decision>")
+		r.Bot.Send(msg)
+		return
+	}
 	err = r.Persistence.InsertOption(bucketName, domain.Option(argStr))
 	if err != nil {
 		log.Println(err)

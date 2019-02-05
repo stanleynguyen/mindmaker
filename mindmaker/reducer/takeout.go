@@ -54,6 +54,6 @@ func (r *Reducer) handleTakeoutCommand(update tgbotapi.Update) {
 		return
 	}
 	userReadableBucketName := strings.SplitN(bucketName, BucketNameSeparator, 2)[1]
-	msg := tgbotapi.NewMessage(update.Message.Chat.ID, fmt.Sprintf("Decision %v taken out of bucket %v 🤫 Here is the new list of decisions:\n%v", optionIdx, userReadableBucketName, getFormattedListOfOptions(updatedOptions)))
+	msg := tgbotapi.NewMessage(update.Message.Chat.ID, fmt.Sprintf("Decision %v taken out of bucket %v 🤫 Here is the new list of decisions:\n%v", optionNumber, userReadableBucketName, getFormattedListOfOptions(updatedOptions)))
 	r.Bot.Send(msg)
 }
