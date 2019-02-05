@@ -40,6 +40,8 @@ func (r *Reducer) HandleUpdates(updates tgbotapi.UpdatesChannel) {
 			r.handleTakeoutCommand(update)
 		case "buckets":
 			r.handleBucketsCommand(update)
+		case "start":
+			r.handleStartCommand(update)
 		default:
 			r.handleAllOthersUpdate(update)
 		}
