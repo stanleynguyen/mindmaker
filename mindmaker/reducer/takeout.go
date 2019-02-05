@@ -34,7 +34,12 @@ func (r *Reducer) handleTakeoutCommand(update tgbotapi.Update) {
 		log.Println(err)
 		r.sendErrMessage(update.Message.Chat.ID)
 		return
+	} else if len(options) == 0 {
+		msg := tgbotapi.NewMessage(update.Message.Chat.ID, "There's currently no decision in your bucket to take out 😕")
+		r.Bot.Send(msg)
+		return
 	}
+
 	optionNumber, err := strconv.Atoi(argStr)
 	if err != nil {
 		msg := tgbotapi.NewMessage(update.Message.Chat.ID, fmt.Sprintf("Boss 😳 can you please gimme a number of the option in this form: /takeout <decision number>?\nIf you forgot what the decision indexes are, here is a reminder:\n%v", getFormattedListOfOptions(options)))
