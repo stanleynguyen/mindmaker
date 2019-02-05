@@ -1,6 +1,8 @@
 # mindmaker
 
-Telegrambot that helps with making up your minds
+A bot that helps with making up your minds, a helpful partner for
+all of your indecisive pals, and the ultimate solution to tedious
+everyday decisions with insignificant impact.
 
 ### Current list of available commands
 
