@@ -1,3 +1,5 @@
+build_heroku_deployment:
+	docker build . -f heroku.dockerfile -t registry.heroku.com/mindmaker/web
 build_dev_image:
 	docker build . -f dev.dockerfile -t mindmakerdev
 start_dev:
