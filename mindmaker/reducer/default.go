@@ -13,6 +13,12 @@ import (
 const defaultResponse string = "Sorry boss 🙇 I didn't get what you just said\nBut I have a dad joke for you if you reply `yes` to this message 😎"
 
 func (r *Reducer) handleAllOthersUpdate(update tgbotapi.Update) {
+	if update.Message.Chat.IsGroup() || update.Message.Chat.IsSuperGroup() || update.Message.Chat.IsChannel() {
+		if !r.handleUpdateFromGroup(update) {
+			return
+		}
+	}
+
 	isYesToDadJokeQn := update.Message.ReplyToMessage != nil &&
 		update.Message.ReplyToMessage.Text == defaultResponse &&
 		strings.EqualFold(update.Message.Text, "YES")
@@ -58,4 +64,42 @@ func getRandomDadJoke() (string, error) {
 	bodyBytes, err := ioutil.ReadAll(resp.Body)
 	body := string(bodyBytes)
 	return body, nil
+}
+
+// handleUpdateFromGroup take care of message from group
+// returning whether to continue with dad joke
+// if mindmaker is in the new members, send greeting message
+// ignore all group events otherwise
+func (r *Reducer) handleUpdateFromGroup(update tgbotapi.Update) bool {
+	hasNewMembers := update.Message.NewChatMembers != nil
+	if hasNewMembers {
+		newMembers := *update.Message.NewChatMembers
+		if len(newMembers) > 0 {
+			for _, member := range newMembers {
+				if member.ID == r.Bot.Self.ID {
+					r.handleStartCommand(update)
+					return false
+				}
+			}
+		}
+	}
+
+	hasMembersLeft := update.Message.LeftChatMember != nil
+	hasNewChatTitle := update.Message.NewChatTitle != ""
+	hasNewChatPic := update.Message.NewChatPhoto != nil
+	hasPicRemoval := update.Message.DeleteChatPhoto
+	hasGroupCreation := update.Message.GroupChatCreated
+	hasSuperGroupCreation := update.Message.SuperGroupChatCreated
+	hasChannelCreation := update.Message.ChannelChatCreated
+
+	continueWithDefaultFlow := !(hasNewMembers ||
+		hasMembersLeft ||
+		hasNewChatTitle ||
+		hasNewChatPic ||
+		hasPicRemoval ||
+		hasGroupCreation ||
+		hasSuperGroupCreation ||
+		hasChannelCreation)
+
+	return continueWithDefaultFlow
 }
