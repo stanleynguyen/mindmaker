@@ -1,11 +1,8 @@
 build_heroku_deployment:
 	docker build . -f heroku.dockerfile -t registry.heroku.com/mindmaker/web
-build_dev_image:
-	docker build . -f dev.dockerfile -t mindmakerdev
 start_dev:
-	mkdir -p tmp/redis/data && \
-	docker network create mindmaker-net || true && \
-	docker stop mindmakerredis || true && \
-	docker rm mindmakerredis || true && \
-	docker run -td --network mindmaker-net --name mindmakerredis -v $(shell pwd)/tmp/redis/data:/data redis && \
-	docker run --rm -it --network mindmaker-net -p 8080:8080 -v $(shell pwd):/go/src/github.com/stanleynguyen/mindmaker mindmakerdev bash
+	docker-compose -f docker-compose.dev.yml up -d
+stop_dev:
+	docker-compose -f docker-compose.dev.yml down
+go_in_dev_container:
+	docker exec -it mindmaker_backend_1 bash
