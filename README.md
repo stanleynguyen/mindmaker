@@ -25,8 +25,5 @@ everyday decisions with insignificant impact.
 ### Getting Started
 
 ```bash
-make build_dev_image
 make start_dev
-# once you're inside the dev container
-bash dev-entrypoint.sh
 ```
