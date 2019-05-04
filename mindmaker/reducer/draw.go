@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"math/rand"
+	"time"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
 )
@@ -28,6 +29,7 @@ func (r *Reducer) handleDrawCommand(update tgbotapi.Update) {
 	}
 
 	options, err := r.Persistence.ReadAllOptions(bucketName)
+	rand.Seed(time.Now().UnixNano())
 	drawnOption := options[rand.Intn(len(options))]
 	msg := tgbotapi.NewMessage(update.Message.Chat.ID, fmt.Sprintf("🎊 Boss you have drawn decision %v 🎉", drawnOption))
 	r.Bot.Send(msg)
