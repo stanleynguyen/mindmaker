@@ -19,6 +19,14 @@ services:
     networks:
       - mindmaker-net
 
+  # postgres:
+  #   image: postgres
+  #   restart: always
+  #   volumes:
+  #     - ./tmp/postgres/data:/var/lib/postgresql/data
+  #   networks:
+  #     - mindmaker-net
+
 networks:
   mindmaker-net:
     driver: bridge

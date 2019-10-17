@@ -25,7 +25,7 @@ func (r *Reducer) handleListCommand(update tgbotapi.Update) {
 		return
 	}
 
-	options, err := r.Persistence.ReadAllOptions(bucketName)
+	options, err := r.Persistence.ReadAllOptions(update.Message.Chat.ID, bucketName)
 	if err != nil {
 		log.Println(err)
 		r.sendErrMessage(update.Message.Chat.ID)

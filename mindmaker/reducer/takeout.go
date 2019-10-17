@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"log"
 	"strconv"
-	"strings"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
 )
@@ -29,7 +28,7 @@ func (r *Reducer) handleTakeoutCommand(update tgbotapi.Update) {
 	}
 
 	argStr := getPrettyArgumentString(update.Message.CommandArguments())
-	options, err := r.Persistence.ReadAllOptions(bucketName)
+	options, err := r.Persistence.ReadAllOptions(update.Message.Chat.ID, bucketName)
 	if err != nil {
 		log.Println(err)
 		r.sendErrMessage(update.Message.Chat.ID)
@@ -52,13 +51,12 @@ func (r *Reducer) handleTakeoutCommand(update tgbotapi.Update) {
 	}
 
 	optionIdx := optionNumber - 1
-	updatedOptions, err := r.Persistence.DeleteOption(bucketName, optionIdx)
+	updatedOptions, err := r.Persistence.DeleteOption(update.Message.Chat.ID, bucketName, int64(optionIdx))
 	if err != nil {
 		log.Println(err)
 		r.sendErrMessage(update.Message.Chat.ID)
 		return
 	}
-	userReadableBucketName := strings.SplitN(bucketName, BucketNameSeparator, 2)[1]
-	msg := tgbotapi.NewMessage(update.Message.Chat.ID, fmt.Sprintf("Decision %v taken out of bucket %v 🤫 Here is the new list of decisions:\n%v", optionNumber, userReadableBucketName, getFormattedListOfOptions(updatedOptions)))
+	msg := tgbotapi.NewMessage(update.Message.Chat.ID, fmt.Sprintf("Decision %v taken out of bucket %v 🤫 Here is the new list of decisions:\n%v", optionNumber, bucketName, getFormattedListOfOptions(updatedOptions)))
 	r.Bot.Send(msg)
 }

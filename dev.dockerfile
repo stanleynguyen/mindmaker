@@ -1,6 +1,6 @@
-FROM golang:1.11.5-alpine3.8
+FROM golang:1.13-alpine
 RUN apk update && apk upgrade
-RUN apk add --no-cache git jq bash sed && go get github.com/golang/dep/cmd/dep && go get github.com/pilu/fresh
+RUN apk add --no-cache git jq bash sed && go get github.com/pilu/fresh
 RUN set -x \
   # Install ngrok (latest official stable from https://ngrok.com/download).
   && apk add --no-cache curl \
