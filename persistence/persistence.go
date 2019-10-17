@@ -13,5 +13,5 @@ type Persistence interface {
 	GetAllBuckets(chatID int64) ([]domain.Bucket, error)
 	InsertOption(chatID int64, bucketName string, option domain.Option) error
 	ReadAllOptions(chatID int64, bucketName string) ([]domain.Option, error)
-	DeleteOption(chatID int64, bucketName string, optionID int64) ([]domain.Option, error)
+	DeleteOption(chatID int64, bucketName string, optionIdx int64) ([]domain.Option, error)
 }
