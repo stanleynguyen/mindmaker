@@ -4,6 +4,8 @@ start_dev:
 	docker-compose -f docker-compose.dev.yml up -d
 stop_dev:
 	docker-compose -f docker-compose.dev.yml down
+logs:
+	docker-compose -f docker-compose.dev.yml logs -f
 go_in_dev_container:
 	docker exec -it mindmaker_backend_1 bash
 rebuild_dev:

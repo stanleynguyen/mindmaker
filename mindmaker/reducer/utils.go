@@ -2,23 +2,14 @@ package reducer
 
 import (
 	"fmt"
-	"strconv"
 	"strings"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
 	"github.com/stanleynguyen/mindmaker/domain"
 )
 
-// BucketNameSeparator string used for concatting chatID with user defined name
-// to form bucket names
-const BucketNameSeparator = " - "
-
 func getPrettyArgumentString(rawArgString string) string {
 	return strings.Trim(rawArgString, " ")
-}
-
-func getBucketNameFromChatID(chatID int64, userGivenName string) string {
-	return strconv.Itoa(int(chatID)) + BucketNameSeparator + userGivenName
 }
 
 func getFormattedListOfOptions(options []domain.Option) string {

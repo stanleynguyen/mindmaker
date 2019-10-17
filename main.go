@@ -7,7 +7,7 @@ import (
 
 	"github.com/joho/godotenv"
 	"github.com/stanleynguyen/mindmaker/mindmaker"
-	"github.com/stanleynguyen/mindmaker/persistence/redis"
+	"github.com/stanleynguyen/mindmaker/persistence/postgres"
 )
 
 func main() {
@@ -18,7 +18,8 @@ func main() {
 		}
 	}
 
-	database, err := redis.NewInstance(os.Getenv("DB"))
+	// database, err := redis.NewInstance(os.Getenv("DB"))
+	database, err := postgres.NewInstance(os.Getenv("DB"))
 	if err != nil {
 		log.Fatal(err)
 	}

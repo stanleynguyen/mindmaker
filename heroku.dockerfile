@@ -1,4 +1,4 @@
-FROM golang:1.11.5-alpine3.8 as builder
+FROM golang:1.13-alpine as builder
 WORKDIR /go/src/github.com/stanleynguyen/mindmaker
 RUN apk update && apk upgrade
 RUN apk add --no-cache curl && curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh

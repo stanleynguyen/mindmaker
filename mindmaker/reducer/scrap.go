@@ -15,8 +15,7 @@ func (r *Reducer) handleScrapCommand(update tgbotapi.Update) {
 		return
 	}
 
-	bucketName := getBucketNameFromChatID(update.Message.Chat.ID, argStr)
-	bucketDoesExist, err := r.Persistence.Exists(bucketName)
+	bucketDoesExist, err := r.Persistence.Exists(update.Message.Chat.ID, argStr)
 	if err != nil {
 		r.sendErrMessage(update.Message.Chat.ID)
 		return
@@ -25,7 +24,7 @@ func (r *Reducer) handleScrapCommand(update tgbotapi.Update) {
 		r.Bot.Send(msg)
 		return
 	}
-	err = r.Persistence.DeleteBucket(bucketName)
+	err = r.Persistence.DeleteBucket(update.Message.Chat.ID, argStr)
 	if err != nil {
 		log.Println(err)
 		r.sendErrMessage(update.Message.Chat.ID)

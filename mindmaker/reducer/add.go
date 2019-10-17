@@ -3,7 +3,6 @@ package reducer
 import (
 	"fmt"
 	"log"
-	"strings"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
 	"github.com/stanleynguyen/mindmaker/domain"
@@ -34,14 +33,13 @@ func (r *Reducer) handleAddCommand(update tgbotapi.Update) {
 		r.Bot.Send(msg)
 		return
 	}
-	err = r.Persistence.InsertOption(bucketName, domain.Option(argStr))
+	err = r.Persistence.InsertOption(update.Message.Chat.ID, bucketName, domain.Option(argStr))
 	if err != nil {
 		log.Println(err)
 		r.sendErrMessage(update.Message.Chat.ID)
 		return
 	}
 
-	userReadableBucketName := strings.SplitN(bucketName, BucketNameSeparator, 2)[1]
-	msg := tgbotapi.NewMessage(update.Message.Chat.ID, fmt.Sprintf("Decision %v added to bucket %v", argStr, userReadableBucketName))
+	msg := tgbotapi.NewMessage(update.Message.Chat.ID, fmt.Sprintf("Decision %v added to bucket %v", argStr, bucketName))
 	r.Bot.Send(msg)
 }

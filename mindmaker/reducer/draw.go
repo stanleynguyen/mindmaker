@@ -28,7 +28,7 @@ func (r *Reducer) handleDrawCommand(update tgbotapi.Update) {
 		return
 	}
 
-	options, err := r.Persistence.ReadAllOptions(bucketName)
+	options, err := r.Persistence.ReadAllOptions(update.Message.Chat.ID, bucketName)
 	rand.Seed(time.Now().UnixNano())
 	drawnOption := options[rand.Intn(len(options))]
 	msg := tgbotapi.NewMessage(update.Message.Chat.ID, fmt.Sprintf("🎊 Boss you have drawn decision %v 🎉", drawnOption))

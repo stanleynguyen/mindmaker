@@ -11,11 +11,21 @@ services:
       - mindmaker-net
     ports:
       - '8080:8080'
+    depends_on:
+      - postgres
 
-  redis:
-    image: redis
+  # redis:
+  #   image: redis
+  #   volumes:
+  #     - ./tmp/redis/data/:/data
+  #   networks:
+  #     - mindmaker-net
+
+  postgres:
+    image: postgres
+    restart: always
     volumes:
-      - ./tmp/redis/data/:/data
+      - ./tmp/postgres/data:/var/lib/postgresql/data
     networks:
       - mindmaker-net
 
