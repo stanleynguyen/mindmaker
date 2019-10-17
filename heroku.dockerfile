@@ -8,5 +8,6 @@ FROM alpine:latest
 RUN apk update && apk upgrade
 RUN apk --no-cache add ca-certificates
 WORKDIR /root/
+COPY --from=builder /go/src/github.com/stanleynguyen/mindmaker/migrations/* ./migrations/
 COPY --from=builder /go/src/github.com/stanleynguyen/mindmaker/mindmaker.out .
 CMD ["./mindmaker.out"]
